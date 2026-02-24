@@ -2,155 +2,124 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gibzz Game Hub | Space Arcade</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gibzz Game Hub | Mobile Space Arcade</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
         body {
-            margin: 0;
-            padding: 0;
-            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            margin: 0; padding: 0; background: #090a0f; color: #fff;
+            font-family: 'Orbitron', sans-serif; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            touch-action: manipulation; /* Mencegah zoom saat tap cepat */
         }
 
-        /* Efek Bintang Bergerak */
+        /* Background Bintang */
         .stars {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.5;
-            animation: moveStars 100s linear infinite;
+            opacity: 0.5; animation: moveStars 100s linear infinite;
         }
+        @keyframes moveStars { from { background-position: 0 0; } to { background-position: 10000px 5000px; } }
 
-        @keyframes moveStars {
-            from { background-position: 0 0; }
-            to { background-position: 10000px 5000px; }
-        }
-
-        h1 {
-            font-size: 3rem;
-            color: #00f2ff;
-            text-shadow: 0 0 20px #00f2ff, 0 0 40px #0062ff;
-            margin-top: 30px;
-            letter-spacing: 5px;
-        }
+        h1 { font-size: 1.5rem; color: #00f2ff; text-shadow: 0 0 10px #00f2ff; margin: 10px 0; }
 
         .arcade-container {
-            background: rgba(15, 52, 96, 0.4);
-            border: 4px solid #00f2ff;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2);
-            backdrop-filter: blur(10px);
-            max-width: 90%;
+            background: rgba(15, 52, 96, 0.4); border: 2px solid #00f2ff;
+            padding: 10px; border-radius: 15px; backdrop-filter: blur(10px);
+            width: 95%; max-width: 400px; position: relative;
         }
 
-        .menu {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
+        .menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px; }
         button {
-            background: transparent;
-            border: 2px solid #e94560;
-            color: #e94560;
-            padding: 10px 20px;
-            font-family: 'Orbitron', sans-serif;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: 0.3s;
-            text-transform: uppercase;
-            font-size: 0.8rem;
+            background: rgba(233, 69, 96, 0.2); border: 1px solid #e94560; color: #e94560;
+            padding: 8px 2px; font-family: 'Orbitron', sans-serif; cursor: pointer;
+            border-radius: 5px; font-size: 0.6rem; transition: 0.3s;
         }
-
-        button:hover {
-            background: #e94560;
-            color: white;
-            box-shadow: 0 0 15px #e94560;
-        }
-
-        button.active {
-            background: #00f2ff;
-            border-color: #00f2ff;
-            color: #090a0f;
-            box-shadow: 0 0 20px #00f2ff;
-        }
+        button.active { background: #00f2ff; border-color: #00f2ff; color: #000; box-shadow: 0 0 10px #00f2ff; }
 
         canvas {
-            background: #000;
-            border: 2px solid #555;
-            display: block;
-            margin: 0 auto;
-            max-width: 100%;
-            image-rendering: pixelated;
+            background: #000; border: 1px solid #333; display: block;
+            margin: 0 auto; width: 100%; height: auto; border-radius: 8px;
         }
 
-        #gameInfo {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #aaa;
+        /* Kontrol Virtual untuk HP */
+        .controls {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr); gap: 10px;
+            margin-top: 15px; width: 180px;
         }
+        .btn-ctrl {
+            background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(0, 242, 255, 0.5);
+            color: #00f2ff; padding: 15px; border-radius: 10px; text-align: center;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .btn-ctrl:active { background: rgba(0, 242, 255, 0.3); transform: scale(0.95); }
+        .up { grid-column: 2; }
+        .left { grid-column: 1; }
+        .down { grid-column: 2; }
+        .right { grid-column: 3; }
 
-        .score-board {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #f1c40f;
-        }
+        .score-board { font-size: 1rem; margin-bottom: 5px; color: #f1c40f; }
     </style>
 </head>
 <body>
 
 <div class="stars"></div>
 
-<h1>GIBZZ GAME HUB</h1>
+<h1>GIBZZ HUB</h1>
 
 <div class="arcade-container">
-    <div class="menu" id="gameButtons">
-        <button onclick="changeGame('snake', this)" class="active">Space Snake</button>
-        <button onclick="changeGame('pingpong', this)">Galaxy Pong</button>
-        <button onclick="changeGame('dodge', this)">Asteroid Dodge</button>
-        <button onclick="changeGame('clicker', this)">Star Clicker</button>
-        <button onclick="changeGame('catch', this)">Moon Catcher</button>
+    <div class="menu">
+        <button onclick="changeGame('snake', this)" class="active">SNAKE</button>
+        <button onclick="changeGame('pingpong', this)">PONG</button>
+        <button onclick="changeGame('dodge', this)">DODGE</button>
+        <button onclick="changeGame('clicker', this)">CLICK</button>
+        <button onclick="changeGame('catch', this)">CATCH</button>
     </div>
 
     <div class="score-board">Score: <span id="currentScore">0</span></div>
-    
     <canvas id="gameCanvas" width="400" height="400"></canvas>
-    
-    <div id="gameInfo">Pilih game di atas untuk memulai misi!</div>
+
+    <div class="controls" id="mobileControls">
+        <div class="btn-ctrl up" ontouchstart="handleInput('UP')" onmousedown="handleInput('UP')">▲</div>
+        <div class="btn-ctrl left" ontouchstart="handleInput('LEFT')" onmousedown="handleInput('LEFT')">◀</div>
+        <div class="btn-ctrl down" ontouchstart="handleInput('DOWN')" onmousedown="handleInput('DOWN')">▼</div>
+        <div class="btn-ctrl right" ontouchstart="handleInput('RIGHT')" onmousedown="handleInput('RIGHT')">▶</div>
+    </div>
 </div>
 
 <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const scoreEl = document.getElementById("currentScore");
-    const infoEl = document.getElementById("gameInfo");
-    let loop = null;
-    let score = 0;
+    let loop = null, score = 0, d = "RIGHT";
 
-    // Reset Game
     function reset(msg) {
         if(loop) clearInterval(loop);
-        score = 0;
-        scoreEl.innerText = score;
-        infoEl.innerText = msg;
+        score = 0; scoreEl.innerText = score;
+        d = "RIGHT";
     }
 
+    // Fungsi Input (Keyboard + Touch)
+    function handleInput(dir) {
+        if(dir === "LEFT" && d !== "RIGHT") d = "LEFT";
+        if(dir === "UP" && d !== "DOWN") d = "UP";
+        if(dir === "RIGHT" && d !== "LEFT") d = "RIGHT";
+        if(dir === "DOWN" && d !== "UP") d = "DOWN";
+    }
+    
+    document.onkeydown = (e) => {
+        if(e.key === "ArrowLeft") handleInput("LEFT");
+        if(e.key === "ArrowUp") handleInput("UP");
+        if(e.key === "ArrowRight") handleInput("RIGHT");
+        if(e.key === "ArrowDown") handleInput("DOWN");
+    };
+
     function changeGame(type, btn) {
-        // Update Button Style
         document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        document.getElementById('mobileControls').style.display = (type === 'clicker' || type === 'catch') ? 'none' : 'grid';
         
         if(type === 'snake') startSnake();
         if(type === 'pingpong') startPingPong();
@@ -159,16 +128,10 @@
         if(type === 'catch') startCatch();
     }
 
-    // 1. SPACE SNAKE
+    // 1. SNAKE
     function startSnake() {
-        reset("Gunakan Panah Keyboard untuk mengendalikan Ular Galaksi!");
-        let box = 20, snake = [{x: 10*box, y: 10*box}], food = {x: 40, y: 40}, d = "RIGHT";
-        document.onkeydown = (e) => {
-            if(e.key == "ArrowLeft" && d != "RIGHT") d = "LEFT";
-            if(e.key == "ArrowUp" && d != "DOWN") d = "UP";
-            if(e.key == "ArrowRight" && d != "LEFT") d = "RIGHT";
-            if(e.key == "ArrowDown" && d != "UP") d = "DOWN";
-        };
+        reset();
+        let box = 20, snake = [{x: 10*box, y: 10*box}], food = {x: 40, y: 40};
         loop = setInterval(() => {
             let head = {x: snake[0].x, y: snake[0].y};
             if(d=="LEFT") head.x-=box; if(d=="UP") head.y-=box; if(d=="RIGHT") head.x+=box; if(d=="DOWN") head.y+=box;
@@ -180,16 +143,16 @@
             snake.unshift(head);
             ctx.fillStyle="#000"; ctx.fillRect(0,0,400,400);
             ctx.fillStyle="#00f2ff"; snake.forEach(s => ctx.fillRect(s.x, s.y, box-2, box-2));
-            ctx.fillStyle="#e94560"; ctx.beginPath(); ctx.arc(food.x+10, food.y+10, 8, 0, Math.PI*2); ctx.fill();
-        }, 100);
+            ctx.fillStyle="#e94560"; ctx.fillRect(food.x, food.y, box-2, box-2);
+        }, 120);
     }
 
-    // 2. GALAXY PONG
+    // 2. PONG
     function startPingPong() {
-        reset("Gunakan Panah Atas & Bawah untuk menjaga gerbang bintang!");
-        let p1=150, b={x:200, y:200, dx:4, dy:4};
-        document.onkeydown = (e) => { if(e.key=="ArrowUp" && p1>0) p1-=30; if(e.key=="ArrowDown" && p1<320) p1+=30; };
+        reset();
+        let p1=150, b={x:200, y:200, dx:5, dy:5};
         loop = setInterval(() => {
+            if(d=="UP" && p1>0) p1-=10; if(d=="DOWN" && p1<320) p1+=10;
             b.x+=b.dx; b.y+=b.dy;
             if(b.y<0 || b.y>390) b.dy*=-1;
             if(b.x<20 && b.y>p1 && b.y<p1+80) { b.dx*=-1.1; score++; scoreEl.innerText = score; }
@@ -197,73 +160,73 @@
             if(b.x<0) return startPingPong();
             ctx.fillStyle="#000"; ctx.fillRect(0,0,400,400);
             ctx.fillStyle="#00f2ff"; ctx.fillRect(10, p1, 10, 80);
-            ctx.fillStyle="#fff"; ctx.shadowBlur = 10; ctx.shadowColor = "white";
-            ctx.fillRect(b.x, b.y, 10, 10); ctx.shadowBlur = 0;
+            ctx.fillStyle="#fff"; ctx.fillRect(b.x, b.y, 10, 10);
         }, 30);
     }
 
-    // 3. ASTEROID DODGE
+    // 3. DODGE
     function startDodge() {
-        reset("Hindari Asteroid Merah yang jatuh!");
+        reset();
         let px=180, obs=[];
-        document.onkeydown = (e) => { if(e.key=="ArrowLeft" && px>0) px-=25; if(e.key=="ArrowRight" && px<360) px+=25; };
         loop = setInterval(() => {
+            if(d=="LEFT" && px>0) px-=8; if(d=="RIGHT" && px<360) px+=8;
             if(Math.random()<0.08) obs.push({x: Math.random()*380, y: -20});
             ctx.fillStyle="#000"; ctx.fillRect(0,0,400,400);
-            ctx.fillStyle="#00f2ff"; ctx.fillRect(px, 370, 40, 20); // Player
+            ctx.fillStyle="#00f2ff"; ctx.fillRect(px, 370, 40, 20);
             ctx.fillStyle="#e94560";
             obs.forEach((o, i) => {
-                o.y+=5; ctx.fillRect(o.x, o.y, 20, 20);
+                o.y+=6; ctx.fillRect(o.x, o.y, 20, 20);
                 if(o.y>370 && o.x>px-20 && o.x<px+40) return startDodge();
                 if(o.y > 400) { obs.splice(i,1); score++; scoreEl.innerText = score; }
             });
         }, 30);
     }
 
-    // 4. STAR CLICKER
+    // 4. CLICKER (Sentuhan langsung di canvas)
     function startClicker() {
-        reset("Klik Bintang yang muncul secepat mungkin!");
+        reset();
         let star = {x: 200, y: 200};
-        canvas.onclick = (e) => {
+        const handleTap = (e) => {
             const rect = canvas.getBoundingClientRect();
-            const mx = e.clientX - rect.left;
-            const my = e.clientY - rect.top;
-            if(mx > star.x && mx < star.x+40 && my > star.y && my < star.y+40) {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const mx = (clientX - rect.left) * (400 / rect.width);
+            const my = (clientY - rect.top) * (400 / rect.height);
+            if(mx > star.x && mx < star.x+50 && my > star.y && my < star.y+50) {
                 score++; scoreEl.innerText = score;
-                star = {x: Math.random()*350, y: Math.random()*350};
+                star = {x: Math.random()*340, y: Math.random()*340};
             }
         };
+        canvas.ontouchstart = handleTap;
+        canvas.onclick = handleTap;
         loop = setInterval(() => {
             ctx.fillStyle="#000"; ctx.fillRect(0,0,400,400);
-            ctx.fillStyle="#f1c40f"; ctx.shadowBlur = 20; ctx.shadowColor = "yellow";
-            ctx.fillRect(star.x, star.y, 40, 40); ctx.shadowBlur = 0;
+            ctx.fillStyle="#f1c40f"; ctx.fillRect(star.x, star.y, 50, 50);
         }, 100);
     }
 
-    // 5. MOON CATCHER
+    // 5. CATCH (Geser jari di canvas)
     function startCatch() {
-        reset("Tangkap koin bintang dengan kapal birumu!");
+        reset();
         let px=175, coin={x:200, y:0};
-        canvas.onmousemove = (e) => { 
+        const handleMove = (e) => {
             const rect = canvas.getBoundingClientRect();
-            px = (e.clientX - rect.left) - 25; 
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            px = (clientX - rect.left) * (400 / rect.width) - 25;
         };
+        canvas.ontouchmove = handleMove;
+        canvas.onmousemove = handleMove;
         loop = setInterval(() => {
-            coin.y+=6;
+            coin.y+=7;
             if(coin.y>400) { coin={x:Math.random()*380, y:0}; }
-            if(coin.y>360 && coin.x>px && coin.x<px+50) { 
-                score++; scoreEl.innerText = score; 
-                coin={x:Math.random()*380, y:0}; 
-            }
+            if(coin.y>360 && coin.x>px && coin.x<px+50) { score++; scoreEl.innerText = score; coin={x:Math.random()*380, y:0}; }
             ctx.fillStyle="#000"; ctx.fillRect(0,0,400,400);
-            ctx.fillStyle="#f1c40f"; ctx.beginPath(); ctx.arc(coin.x, coin.y, 10, 0, Math.PI*2); ctx.fill(); // Coin
-            ctx.fillStyle="#00f2ff"; ctx.fillRect(px, 380, 50, 10); // Player
+            ctx.fillStyle="#f1c40f"; ctx.beginPath(); ctx.arc(coin.x, coin.y, 10, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle="#00f2ff"; ctx.fillRect(px, 380, 50, 10);
         }, 20);
     }
 
-    // Start default game
     startSnake();
 </script>
-
 </body>
-  </html>
+    </html>
